@@ -1,6 +1,6 @@
 # Welcome to My Thoughts
 
-## Live site: [https://comment-system-client.vercel.app/](https://comment-system-client.vercel.app/)
+## Live site: 
 
 ## Installation
 
@@ -10,7 +10,7 @@
 
 ## Frontend
 
-- https://github.com/Mueem-Nahid/comment-system-client
+- 
 
 ## Technology
 - TypeScript
