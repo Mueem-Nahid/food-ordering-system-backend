@@ -8,13 +8,14 @@ const createComment = async (
   productId: string,
   newComment: IComment,
 ): Promise<IProduct | null> => {
-  const updatedPost = await Product.findOneAndUpdate(
+  const updatedProduct = await Product.findOneAndUpdate(
     { _id: productId },
     { $push: { comments: newComment } },
     { new: true },
   );
-  if (!updatedPost) throw new ApiError(httpStatus.NOT_FOUND, 'Post not found');
-  return updatedPost;
+  if (!updatedProduct)
+    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+  return updatedProduct;
 };
 
 export const CommentService = {
