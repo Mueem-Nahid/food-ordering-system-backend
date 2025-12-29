@@ -5,7 +5,7 @@ export type IUser = {
   email: string;
   // password: string;
   name: string;
-  address: string;
+  address?: string;
   role: string;
   phoneNumber?: string;
 };
