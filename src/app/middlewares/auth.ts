@@ -12,18 +12,23 @@ const auth =
       const endpoint: string = req.baseUrl;
       console.log(endpoint);
       if (
-        endpoint === '/api/v1/books' &&
+        endpoint === '/api/v1/products' &&
         req.method === 'GET' &&
         !req.headers.authorization
       )
         return next();
 
-      const token: string | undefined = req.headers.authorization;
-      if (!token)
+      // Expect "Bearer <token>"
+      const authHeader: string | undefined = req.headers.authorization;
+      if (!authHeader)
         throw new ApiError(
           httpStatus.UNAUTHORIZED,
           'You are not authorized to perform this action.'
         );
+
+      const token = authHeader.startsWith('Bearer ')
+        ? authHeader.split(' ')[1]
+        : authHeader;
 
       let verifiedUser = null;
       verifiedUser = jwtHelper.verifyToken(
@@ -33,11 +38,11 @@ const auth =
 
       req.user = verifiedUser;
 
-      /*if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role))
-              throw new ApiError(
-                httpStatus.FORBIDDEN,
-                'Forbidden. You are not authorized to perform this action.'
-              );*/
+      if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role))
+        throw new ApiError(
+          httpStatus.FORBIDDEN,
+          'Forbidden. You are not authorized to perform this action.'
+        );
 
       next();
     } catch (error) {

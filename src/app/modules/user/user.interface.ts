@@ -3,9 +3,11 @@ import { Model } from 'mongoose';
 export type IUser = {
   _id: string;
   email: string;
-  password: string;
+  // password: string;
   name: string;
   address: string;
+  role: string;
+  phoneNumber?: string;
 };
 
 // static methods
@@ -13,10 +15,10 @@ export type IUser = {
 export type IUserMethods = {
   isExist(
     email: string
-  ): Promise<Pick<IUser, '_id' | 'password' | 'email' | 'name'> | null>;
+  ): Promise<Pick<IUser, '_id' | 'email' | 'name'> | null>;
   isExistById(
     _id: string
-  ): Promise<Pick<IUser, '_id' | 'password' | 'email' | 'name'> | null>;
+  ): Promise<Pick<IUser, '_id' | 'email' | 'name'> | null>;
   isPasswordMatched(
     enteredPassword: string,
     savedPassword: string

@@ -11,6 +11,27 @@ const createUserIntoDb = async (user: IUser): Promise<IUser | null> => {
   return createdUser;
 };
 
+// Upsert user from Google/NextAuth
+const upsertGoogleUser = async ({
+  email,
+  name,
+}: {
+  email: string;
+  name: string;
+}): Promise<IUser | null> => {
+  let user = await User.findOne({ email });
+  if (user) return user;
+  // Create with default values for required fields
+  user = await User.create({
+    email,
+    name,
+    address: '',
+    role: 'user',
+  });
+  return user;
+};
+
 export const UserService = {
   createUserIntoDb,
+  upsertGoogleUser,
 };

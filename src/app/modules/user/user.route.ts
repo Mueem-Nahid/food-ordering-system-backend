@@ -11,4 +11,10 @@ router.post(
   UserController.createUser
 );
 
+// Google/NextAuth user upsert endpoint
+router.post(
+  '/google-auth',
+  UserController.upsertGoogleUser
+);
+
 export const UserRoutes = router;

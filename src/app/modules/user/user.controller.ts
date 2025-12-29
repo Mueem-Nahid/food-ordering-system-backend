@@ -18,6 +18,29 @@ const createUser = catchAsync(
   }
 );
 
+// Upsert user from Google/NextAuth
+const upsertGoogleUser = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const { email, name } = req.body;
+    if (!email || !name) {
+      sendResponse(res, {
+        statusCode: httpStatus.BAD_REQUEST,
+        success: false,
+        message: 'Email and name are required from Google profile.',
+      });
+      return;
+    }
+    const result: IUser | null = await UserService.upsertGoogleUser({ email, name });
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'User upserted from Google profile.',
+      data: result,
+    });
+  }
+);
+
 export const UserController = {
   createUser,
+  upsertGoogleUser,
 };
