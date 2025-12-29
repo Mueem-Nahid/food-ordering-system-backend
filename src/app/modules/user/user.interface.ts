@@ -5,6 +5,7 @@ export type IUser = {
   email: string;
   password: string;
   name: string;
+  address: string;
 };
 
 // static methods
