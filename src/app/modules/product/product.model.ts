@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { IProduct, ProductModel } from './product.interface';
+import { commentSchema } from '../comment/comment.model';
 
 export const productSchema = new Schema<IProduct>(
   {
@@ -27,16 +28,10 @@ export const productSchema = new Schema<IProduct>(
       type: String,
       required: true,
     },
-    reviewedBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    },
-    comment: {
-      type: String,
-    },
+    comment: [commentSchema],
     availability: {
-      type: []
-    }
+      type: [String],
+    },
   },
   { timestamps: true },
 );

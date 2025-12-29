@@ -5,7 +5,7 @@ import httpStatus from 'http-status';
 import { IComment } from './comment.interface';
 import { Types } from 'mongoose';
 import { CommentService } from './comment.service';
-import { IPost } from '../post/post.interface';
+import { IProduct } from '../product/product.interface';
 
 const createComment = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
@@ -21,7 +21,7 @@ const createComment = catchAsync(
       commentedBy: user?._id,
       comment,
     };
-    const result: IPost | null = await CommentService.createComment(
+    const result: IProduct | null = await CommentService.createComment(
       postId,
       newComment
     );

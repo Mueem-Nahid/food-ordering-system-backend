@@ -1,17 +1,17 @@
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
-import { Post } from '../post/post.model';
+import { Product } from '../product/product.model';
 import { IComment } from './comment.interface';
-import { IPost } from '../post/post.interface';
+import { IProduct } from '../product/product.interface';
 
 const createComment = async (
-  postId: string,
-  newComment: IComment
-): Promise<IPost | null> => {
-  const updatedPost = await Post.findOneAndUpdate(
-    { _id: postId },
+  productId: string,
+  newComment: IComment,
+): Promise<IProduct | null> => {
+  const updatedPost = await Product.findOneAndUpdate(
+    { _id: productId },
     { $push: { comments: newComment } },
-    { new: true }
+    { new: true },
   );
   if (!updatedPost) throw new ApiError(httpStatus.NOT_FOUND, 'Post not found');
   return updatedPost;

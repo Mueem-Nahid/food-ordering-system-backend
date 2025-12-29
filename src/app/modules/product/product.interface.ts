@@ -1,4 +1,5 @@
 import { Model, ObjectId } from 'mongoose';
+import { IComment } from '../comment/comment.interface';
 
 export type IProduct = {
   _id: ObjectId;
@@ -7,8 +8,7 @@ export type IProduct = {
   desc: string;
   price: number;
   categoryId: ObjectId;
-  reviewedBy?: ObjectId;
-  comment?: string;
+  comment?: IComment[];
   availability?: string[];
 };
 
