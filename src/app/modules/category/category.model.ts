@@ -3,9 +3,6 @@ import { CategoryModel, ICategory } from './category.interface';
 
 export const categorySchema = new Schema<ICategory>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-    },
     name: {
       type: String,
       required: true,

@@ -4,9 +4,6 @@ import { commentSchema } from '../comment/comment.model';
 
 export const productSchema = new Schema<IProduct>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-    },
     name: {
       type: String,
       required: true,

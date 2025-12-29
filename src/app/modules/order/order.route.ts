@@ -16,14 +16,22 @@ router.post(
 
 router.get(
   '/',
-  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN),
   OrderController.getAllOrders,
 );
 
 router.get('/:id', auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN), OrderController.getAnOrder);
 
-router.patch('/:id', auth(ENUM_USER_ROLE.USER), OrderController.updateOrder);
+router.patch(
+  '/:id',
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  OrderController.updateOrder,
+);
 
-router.delete('/:id', auth(ENUM_USER_ROLE.USER), OrderController.deleteOrder);
+router.delete(
+  '/:id',
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  OrderController.deleteOrder,
+);
 
 export const OrderRoutes = router;

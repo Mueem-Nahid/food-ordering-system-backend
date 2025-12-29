@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(
   '/',
   validateRequest(ProductValidation.createProductZodSchema),
-  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN),
   ProductController.createProduct,
 );
 
@@ -23,13 +23,12 @@ router.post(
 
 router.get('/:id', ProductController.getAProduct);
 
-router.patch('/:id', auth(ENUM_USER_ROLE.USER), ProductController.updateProduct);
+router.patch('/:id', auth(ENUM_USER_ROLE.ADMIN), ProductController.updateProduct);
 
-router.delete('/:id', auth(ENUM_USER_ROLE.USER), ProductController.deleteProduct);
+router.delete('/:id', auth(ENUM_USER_ROLE.ADMIN), ProductController.deleteProduct);
 
 router.get(
   '/',
-  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
   ProductController.getAllProducts,
 );
 

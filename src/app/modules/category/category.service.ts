@@ -7,7 +7,6 @@ import {
 } from '../../../interfaces/common';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import { ObjectId, SortOrder } from 'mongoose';
-import httpStatus from 'http-status';
 
 const createCategory = async (categoryData: ICategory): Promise<ICategory | null> => {
   const createdCategory = await Category.create(categoryData);
