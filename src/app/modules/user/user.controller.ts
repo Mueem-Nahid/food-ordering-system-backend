@@ -30,12 +30,15 @@ const upsertGoogleUser = catchAsync(
       });
       return;
     }
-    const result: IUser | null = await UserService.upsertGoogleUser({ email, name });
+    const { user, accessToken } = await UserService.upsertGoogleUser({ email, name });
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: 'User upserted from Google profile.',
-      data: result,
+      data: {
+        user,
+        accessToken,
+      },
     });
   }
 );

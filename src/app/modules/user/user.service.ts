@@ -1,6 +1,9 @@
 import { IUser } from './user.interface';
 import { User } from './user.model';
 import ApiError from '../../../errors/ApiError';
+import { Secret } from 'jsonwebtoken';
+import config from '../../../config';
+import { jwtHelper } from '../../../helpers/jwtHelper';
 
 const createUserIntoDb = async (user: IUser): Promise<IUser | null> => {
   const createdUser = await User.create(user);
@@ -18,17 +21,27 @@ const upsertGoogleUser = async ({
 }: {
   email: string;
   name: string;
-}): Promise<IUser | null> => {
+}): Promise<{ user: IUser; accessToken: string }> => {
   let user = await User.findOne({ email });
-  if (user) return user;
-  // Create with default values for required fields
-  user = await User.create({
-    email,
-    name,
-    address: '',
-    role: 'user',
-  });
-  return user;
+  if (!user) {
+    user = await User.create({
+      email,
+      name,
+      address: '',
+      role: 'user',
+    });
+  }
+  // Issue backend JWT
+  const accessToken = jwtHelper.createToken(
+    {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+    },
+    config.jwt.jwt_secret as Secret,
+    { expiresIn: config.jwt.jwt_expired_time }
+  );
+  return { user, accessToken };
 };
 
 export const UserService = {
