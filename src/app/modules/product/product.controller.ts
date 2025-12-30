@@ -16,12 +16,9 @@ import config from '../../../config';
 
 const createProduct = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
-    const postData = req.body;
-    const userObj: JwtPayload | null = req.user;
-    const userEmail = userObj?.email;
+    const productData = req.body;
     const result: IProduct | null = await ProductService.createProduct(
-      postData,
-      userEmail,
+      productData
     );
 
     sendResponse(res, {
@@ -40,9 +37,6 @@ const getAllProducts = catchAsync(
       req.query,
       paginationFields,
     );
-
-    const userObj: JwtPayload | null = req.user;
-    const userId = userObj?._id;
 
     const result: IGenericResponsePagination<IProduct[]> =
       await ProductService.getAllProducts(filters, paginationOptions);
@@ -92,9 +86,7 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
 
 const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const userObj: JwtPayload | null = req.user;
-  const userId = userObj?._id;
-  const result = await ProductService.deleteProduct(id, userId);
+  const result = await ProductService.deleteProduct(id);
   if (!result)
     sendResponse<IProduct>(res, {
       statusCode: httpStatus.NOT_FOUND,

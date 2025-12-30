@@ -4,3 +4,4 @@ logs
 .vercel
 dist
 .idea
+.env*.local

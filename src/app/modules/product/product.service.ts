@@ -13,8 +13,7 @@ import { productSearchableFields } from './product.constant';
 import config from '../../../config';
 
 const createProduct = async (
-  productData: IProduct,
-  userEmail: string,
+  productData: IProduct
 ): Promise<IProduct | null> => {
   const createdProduct = await Product.create(productData);
   if (!createdProduct) throw new ApiError(400, 'Failed to create product.');
@@ -64,7 +63,7 @@ const getAllProducts = async (
     andConditions.length > 0 ? { $and: andConditions } : {};
 
   const result = await Product.find(whereCondition)
-    .populate('user')
+    .populate('categoryId', 'name')
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
@@ -82,9 +81,7 @@ const getAllProducts = async (
 };
 
 const getAProduct = async (id: string | ObjectId): Promise<IProduct | null> => {
-  return Product.findById(id)
-    .populate('user')
-    .populate('comments.commentedBy', 'name', 'User');
+  return Product.findById(id);
 };
 
 const updateProduct = async (
@@ -98,8 +95,8 @@ const updateProduct = async (
   );
 };
 
-const deleteProduct = async (id: string, user: string): Promise<IProduct | null> => {
-  return Product.findOneAndDelete({ _id: id, user });
+const deleteProduct = async (id: string): Promise<IProduct | null> => {
+  return Product.findOneAndDelete({ _id: id });
 };
 
 export const ProductService = {
