@@ -44,7 +44,27 @@ const upsertGoogleUser = async ({
   return { user, accessToken };
 };
 
+const getAllUsers = async (): Promise<IUser[]> => {
+  return User.find();
+};
+
+const getUserById = async (id: string): Promise<IUser | null> => {
+  return User.findById(id);
+};
+
+const updateUser = async (id: string, payload: Partial<IUser>): Promise<IUser | null> => {
+  return User.findByIdAndUpdate(id, payload, { new: true });
+};
+
+const deleteUser = async (id: string): Promise<IUser | null> => {
+  return User.findByIdAndDelete(id);
+};
+
 export const UserService = {
   createUserIntoDb,
   upsertGoogleUser,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
 };
