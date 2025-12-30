@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, CallbackWithoutResult } from 'mongoose';
 import { AdminModel, IAdmin } from './admin.interface';
 import { hashPassword } from '../../../helpers/hashPassword';
 import { IUser } from '../user/user.interface';
@@ -40,7 +40,7 @@ adminSchema.methods.isExist = async function (
 
 adminSchema.methods.isExistById = async function (
   _id: string
-): Promise<Pick<IUser, '_id' | 'password' | 'email' | 'name'> | null> {
+): Promise<Pick<IUser, '_id' | 'email' | 'name'> | null> {
   return User.findOne(
     { _id },
     { _id: 1, password: 1, email: 1, name: 1 }
@@ -56,9 +56,8 @@ adminSchema.methods.isPasswordMatched = async function (
 
 // hash password using pre hook middleware (fat model thin controller)
 // User.create() / user.save()
-adminSchema.pre('save', async function (next) {
+adminSchema.pre('save', async function () {
   this.password = await hashPassword.encryptPassword(this.password);
-  next();
 });
 
 export const Admin: AdminModel = model<IAdmin, AdminModel>(

@@ -1,7 +1,7 @@
 import { Model, ObjectId } from 'mongoose';
 
 export type IOrder = {
-  _id: ObjectId;
+  // _id: ObjectId;
   product: ObjectId[];
   user: ObjectId;
   email: string;

@@ -3,9 +3,6 @@ import { OrderModel, IOrder } from './order.interface';
 
 export const OrderSchema = new Schema<IOrder>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-    },
     product: [
       {
         type: Schema.Types.ObjectId,

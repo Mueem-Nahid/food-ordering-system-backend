@@ -6,13 +6,13 @@ import {
   IPaginationOptions,
 } from '../../../interfaces/common';
 import { paginationHelper } from '../../../helpers/paginationHelper';
-import { ObjectId, SortOrder } from 'mongoose';
+import { ObjectId, SortOrder, Types } from 'mongoose';
 import httpStatus from 'http-status';
 
 const createOrder = async (orderData: IOrder): Promise<IOrder | null> => {
   const createdOrder = await Order.create(orderData);
   if (!createdOrder) throw new ApiError(400, 'Failed to create order.');
-  return await getAnOrder(createdOrder._id);
+  return await getAnOrder(createdOrder._id.toString());
 };
 
 const getAllOrders = async (
@@ -64,14 +64,14 @@ const getAnOrder = async (id: string | ObjectId): Promise<IOrder | null> => {
 const updateOrder = async (
   id: string,
   payload: Partial<IOrder>,
-  userId: string,
+  userId: ObjectId,
 ): Promise<IOrder | null> => {
   return Order.findOneAndUpdate({ _id: id, user: userId }, payload, {
     new: true,
   });
 };
 
-const deleteOrder = async (id: string, userId: string): Promise<IOrder | null> => {
+const deleteOrder = async (id: string, userId: ObjectId): Promise<IOrder | null> => {
   return Order.findOneAndDelete({ _id: id, user: userId });
 };
 

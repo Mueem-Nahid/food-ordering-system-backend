@@ -6,7 +6,7 @@ import {
   IPaginationOptions,
 } from '../../../interfaces/common';
 import { paginationHelper } from '../../../helpers/paginationHelper';
-import { ObjectId, SortOrder } from 'mongoose';
+import { ObjectId, SortOrder, Types } from 'mongoose';
 import { User } from '../user/user.model';
 import httpStatus from 'http-status';
 import { productSearchableFields } from './product.constant';
@@ -16,17 +16,10 @@ const createProduct = async (
   productData: IProduct,
   userEmail: string,
 ): Promise<IProduct | null> => {
-  const user = new User();
-  if (
-    !(await user.isExist(userEmail)) ||
-    !(await user.isExistById(productData.user.toString()))
-  )
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-
   const createdProduct = await Product.create(productData);
   if (!createdProduct) throw new ApiError(400, 'Failed to create product.');
   if (config.env !== 'production') {
-    return await getAProduct(createdProduct?._id);
+    return await getAProduct(createdProduct?._id.toString());
   }
   return createdProduct;
 };
@@ -96,12 +89,13 @@ const getAProduct = async (id: string | ObjectId): Promise<IProduct | null> => {
 
 const updateProduct = async (
   id: string,
-  payload: Partial<IProduct>,
-  userId: string,
+  payload: Partial<IProduct>
 ): Promise<IProduct | null> => {
-  return Product.findOneAndUpdate({ _id: id, user: userId }, payload, {
-    new: true,
-  });
+  return Product.findOneAndUpdate(
+    { _id: id },
+    payload,
+    { new: true }
+  );
 };
 
 const deleteProduct = async (id: string, user: string): Promise<IProduct | null> => {

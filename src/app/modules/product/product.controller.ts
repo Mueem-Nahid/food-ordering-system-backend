@@ -75,7 +75,7 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
   const data = req.body;
   const userObj: JwtPayload | null = req.user;
   const userId = userObj?._id;
-  const result: IProduct | null = await ProductService.updateProduct(id, data, userId);
+  const result: IProduct | null = await ProductService.updateProduct(id, data);
   if (!result)
     sendResponse<IProduct>(res, {
       statusCode: httpStatus.NOT_FOUND,

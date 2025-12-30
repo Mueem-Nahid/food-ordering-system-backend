@@ -26,7 +26,7 @@ const createPost = async (
   const createdPost = await Post.create(postData);
   if (!createdPost) throw new ApiError(400, 'Failed to create post.');
   if(config.env !== 'production') {
-    return  await getAPost(createdPost?._id);
+    return  await getAPost(createdPost?._id.toString());
   }
   return createdPost;
 };

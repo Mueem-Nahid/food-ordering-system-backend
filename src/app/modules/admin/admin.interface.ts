@@ -20,10 +20,10 @@ export type IAdmin = {
 export type IAdminMethods = {
   isExist(
     email: string
-  ): Promise<Pick<IAdmin, '_id' | 'password' | 'email' | 'name'> | null>;
+  ): Promise<Pick<IAdmin, '_id' | 'email' | 'name'> | null>;
   isExistById(
     _id: string
-  ): Promise<Pick<IUser, '_id' | 'password' | 'email' | 'name'> | null>;
+  ): Promise<Pick<IUser, '_id' | 'email' | 'name'> | null>;
   isPasswordMatched(
     enteredPassword: string,
     savedPassword: string

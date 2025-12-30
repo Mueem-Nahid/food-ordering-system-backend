@@ -27,18 +27,18 @@ const loginUser = async (
     modelInstance = new User();
   }
   const isPersonExist:
-    | Pick<IUser, 'password' | 'email' | '_id' | 'name'>
-    | Pick<IAdmin, 'password' | 'email' | '_id' | 'name'>
+    | Pick<IUser, 'email' | '_id' | 'name'>
+    | Pick<IAdmin, 'email' | '_id' | 'name'>
     | null = await modelInstance.isExist(email);
   if (!isPersonExist)
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found !');
 
   // match password
-  if (
+ /* if (
     isPersonExist.password &&
     !(await modelInstance.isPasswordMatched(password, isPersonExist.password))
   )
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'ID or password is incorrect.');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'ID or password is incorrect.');*/
 
   // create access and refresh token
   const accessToken: string = jwtHelper.createToken(

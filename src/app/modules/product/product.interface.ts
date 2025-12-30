@@ -2,7 +2,7 @@ import { Model, ObjectId } from 'mongoose';
 import { IComment } from '../comment/comment.interface';
 
 export type IProduct = {
-  _id: ObjectId;
+  // _id: ObjectId;
   name: string;
   productImage: string;
   desc: string;
@@ -10,6 +10,10 @@ export type IProduct = {
   categoryId: ObjectId;
   comment?: IComment[];
   availability?: string[];
+};
+
+export type IProductFilter = {
+  searchTerm?: string;
 };
 
 export type ProductModel = Model<IProduct, Record<string, unknown>>;

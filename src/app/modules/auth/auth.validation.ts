@@ -2,20 +2,14 @@ import { z } from 'zod';
 
 const loginZodSchema = z.object({
   body: z.object({
-    email: z.string({
-      required_error: 'Email is required',
-    }),
-    password: z.string({
-      required_error: 'Password is required',
-    }),
+    email: z.string().nonempty('Email is required'),
+    password: z.string().nonempty('Password is required'),
   }),
 });
 
 const refreshTokenZodSchema = z.object({
   cookies: z.object({
-    refreshToken: z.string({
-      required_error: 'Token is required',
-    }),
+    refreshToken: z.string().nonempty('Token is required'),
   }),
 });
 

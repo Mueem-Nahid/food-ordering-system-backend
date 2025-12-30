@@ -2,7 +2,7 @@ import mongoose, { Model, ObjectId } from 'mongoose';
 import { IComment } from '../comment/comment.interface';
 
 export type IPost = {
-  _id?: ObjectId;
+  // _id?: ObjectId;
   post: string;
   likes: ObjectId[];
   dislikes: ObjectId[];

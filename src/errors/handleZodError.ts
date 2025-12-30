@@ -4,8 +4,9 @@ import { IGenericErrorMessage } from '../interfaces/error';
 
 const handleZodError = (error: ZodError): IGenericErrorResponse => {
   const errors: IGenericErrorMessage[] = error.issues.map((issue: ZodIssue) => {
+    const lastPath = issue?.path.slice(-1)[0];
     return {
-      path: issue?.path.slice(-1)[0],
+      path: typeof lastPath === 'string' || typeof lastPath === 'number' ? lastPath : String(lastPath),
       message: issue?.message,
     };
   });
