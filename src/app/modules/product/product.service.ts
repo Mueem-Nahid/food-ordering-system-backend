@@ -7,8 +7,6 @@ import {
 } from '../../../interfaces/common';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import { ObjectId, SortOrder, Types } from 'mongoose';
-import { User } from '../user/user.model';
-import httpStatus from 'http-status';
 import { productSearchableFields } from './product.constant';
 import config from '../../../config';
 
@@ -29,11 +27,10 @@ const getAllProducts = async (
 ): Promise<IGenericResponsePagination<IProduct[]>> => {
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelper.calculatePagination(paginationOption);
-  // const { searchTerm, ...filtersData } = filters;
-  const { searchTerm, ...otherFilters } = filters;
-  const andConditions = [];
+  const { searchTerm, categoryName, ...otherFilters } = filters;
+  const andConditions: any[] = [];
 
-  // making implicit and
+  // Search term filter
   if (searchTerm) {
     andConditions.push({
       $or: productSearchableFields.map((field: string) => ({
@@ -45,20 +42,94 @@ const getAllProducts = async (
     });
   }
 
+  // Other direct filters
   if (Object.keys(otherFilters).length) {
-    // Exclude publicationDate from otherFilters
-    if (Object.keys(otherFilters).length > 1) {
-      andConditions.push({
-        $and: Object.entries(otherFilters).map(([field, value]) => ({
-          [field]: value,
-        })),
-      });
-    }
+    andConditions.push({
+      ...otherFilters,
+    });
   }
 
   const sortConditions: { [key: string]: SortOrder } = {};
   if (sortBy && sortOrder) sortConditions[sortBy] = sortOrder;
 
+  // If filtering by category name, use aggregation
+  if (categoryName) {
+    const aggregatePipeline: any[] = [
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      { $unwind: '$category' },
+      {
+        $match: {
+          'category.name': {
+            $regex: categoryName,
+            $options: 'i',
+          },
+          ...(andConditions.length > 0 ? { $and: andConditions } : {}),
+        },
+      },
+      {
+        $sort: Object.keys(sortConditions).length
+          ? Object.fromEntries(
+              Object.entries(sortConditions).map(([key, value]) => [
+                key,
+                value === 'asc' || value === 1 ? 1 : -1,
+              ])
+            )
+          : { createdAt: -1 },
+      },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $project: {
+          __v: 0,
+        },
+      },
+    ];
+
+    const result = await Product.aggregate(aggregatePipeline);
+
+    // For total count with category name filter
+    const countPipeline = [
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      { $unwind: '$category' },
+      {
+        $match: {
+          'category.name': {
+            $regex: categoryName,
+            $options: 'i',
+          },
+          ...(andConditions.length > 0 ? { $and: andConditions } : {}),
+        },
+      },
+      { $count: 'total' },
+    ];
+    const countResult = await Product.aggregate(countPipeline);
+    const total = countResult[0]?.total || 0;
+
+    return {
+      meta: {
+        page,
+        limit,
+        total,
+      },
+      data: result,
+    };
+  }
+
+  // Default: no category name filter
   const whereCondition =
     andConditions.length > 0 ? { $and: andConditions } : {};
 
@@ -68,7 +139,7 @@ const getAllProducts = async (
     .skip(skip)
     .limit(limit);
 
-  const total: number = await Product.countDocuments();
+  const total: number = await Product.countDocuments(whereCondition);
 
   return {
     meta: {

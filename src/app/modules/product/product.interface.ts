@@ -14,6 +14,7 @@ export type IProduct = {
 
 export type IProductFilter = {
   searchTerm?: string;
+  categoryName?: string;
 };
 
 export type ProductModel = Model<IProduct, Record<string, unknown>>;
