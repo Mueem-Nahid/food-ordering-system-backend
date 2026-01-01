@@ -19,9 +19,17 @@ router.post(
   UserController.upsertGoogleUser
 );
 
-router.get('/:id', auth(ENUM_USER_ROLE.ADMIN), UserController.getUserById);
+router.get(
+  '/:id',
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  UserController.getUserById,
+);
 
-router.patch('/:id', auth(ENUM_USER_ROLE.ADMIN), UserController.updateUser);
+router.patch(
+  '/:id',
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  UserController.updateUser,
+);
 
 router.delete('/:id', auth(ENUM_USER_ROLE.ADMIN), UserController.deleteUser);
 
