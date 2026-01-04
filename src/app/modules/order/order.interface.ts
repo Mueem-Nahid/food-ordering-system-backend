@@ -8,7 +8,7 @@ export type IOrder = {
   email: string;
   payment_status: string;
   amount: string;
-  totalItems: string;
+  total_items: string;
   payment_method: string;
   delivery_address: string;
   phone_no: string;

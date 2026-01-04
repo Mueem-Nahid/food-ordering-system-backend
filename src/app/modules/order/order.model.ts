@@ -28,7 +28,7 @@ export const OrderSchema = new Schema<IOrder>(
       type: String,
       required: true,
     },
-    totalItems: {
+    total_items: {
       type: String,
       required: true,
     },
