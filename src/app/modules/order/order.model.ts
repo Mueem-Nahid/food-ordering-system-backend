@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { OrderModel, IOrder } from './order.interface';
+import { OrderStatus } from '../../../enums/order';
 
 export const OrderSchema = new Schema<IOrder>(
   {
@@ -19,7 +20,7 @@ export const OrderSchema = new Schema<IOrder>(
       type: String,
       required: true,
     },
-    paymentStatus: {
+    payment_status: {
       type: String,
       required: true,
     },
@@ -27,7 +28,7 @@ export const OrderSchema = new Schema<IOrder>(
       type: String,
       required: true,
     },
-    totalItems: {
+    total_items: {
       type: String,
       required: true,
     },
@@ -43,6 +44,12 @@ export const OrderSchema = new Schema<IOrder>(
       type: String,
       required: true,
     },
+    order_status: {
+      type: String,
+      enum: Object.values(OrderStatus),
+      default: OrderStatus.PENDING,
+      required: true,
+    }
   },
   { timestamps: true },
 );
