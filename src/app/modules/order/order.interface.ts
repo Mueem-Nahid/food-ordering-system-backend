@@ -17,6 +17,7 @@ export type IOrderProductItem = {
 };
 
 export type IOrder = {
+  _id?: Types.ObjectId;
   product: IOrderProductItem[];
   user: Types.ObjectId;
   email: string;

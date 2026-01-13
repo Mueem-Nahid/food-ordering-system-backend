@@ -63,9 +63,7 @@ const getAnOrder = catchAsync(
 const updateOrder = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const data = req.body;
-  const userObj: JwtPayload | null = req.user;
-  const userId = userObj?._id;
-  const result: IOrder | null = await OrderService.updateOrder(id, data, userId);
+  const result: IOrder | null = await OrderService.updateOrder(id, data);
   if (!result)
     sendResponse<IOrder>(res, {
       statusCode: httpStatus.NOT_FOUND,
