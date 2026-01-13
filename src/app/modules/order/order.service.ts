@@ -7,7 +7,6 @@ import {
 } from '../../../interfaces/common';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import { ObjectId, SortOrder, Types } from 'mongoose';
-import httpStatus from 'http-status';
 
 const createOrder = async (orderData: IOrder): Promise<IOrder | null> => {
   const createdOrder = await Order.create(orderData);
@@ -40,7 +39,6 @@ const getAllOrders = async (
 
   const result = await Order.find(whereCondition)
     .populate('user')
-    .populate('product')
     .sort(sortConditions)
     .skip(skip)
     .limit(limit);
@@ -58,7 +56,7 @@ const getAllOrders = async (
 };
 
 const getAnOrder = async (id: string | ObjectId): Promise<IOrder | null> => {
-  return Order.findById(id).populate('user').populate('product');
+  return Order.findById(id).populate('user');
 };
 
 const updateOrder = async (
@@ -75,10 +73,17 @@ const deleteOrder = async (id: string, userId: ObjectId): Promise<IOrder | null>
   return Order.findOneAndDelete({ _id: id, user: userId });
 };
 
+const getOrdersByUser = async (userId: string): Promise<IOrder[]> => {
+  // Ensure userId is an ObjectId for the query
+  const objectId = new Types.ObjectId(userId);
+  return Order.find({ user: objectId }).populate('user');
+};
+
 export const OrderService = {
   createOrder,
   getAllOrders,
   getAnOrder,
   updateOrder,
   deleteOrder,
+  getOrdersByUser,
 };
