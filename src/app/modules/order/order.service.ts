@@ -9,9 +9,20 @@ import { paginationHelper } from '../../../helpers/paginationHelper';
 import { ObjectId, SortOrder, Types } from 'mongoose';
 
 const createOrder = async (orderData: IOrder): Promise<IOrder | null> => {
-  const createdOrder = await Order.create(orderData);
-  if (!createdOrder) throw new ApiError(400, 'Failed to create order.');
-  return await getAnOrder(createdOrder._id.toString());
+  const session = await Order.startSession();
+  let createdOrder: IOrder | null = null;
+  try {
+    session.startTransaction();
+    createdOrder = await Order.create([orderData], { session }).then(res => res[0]);
+    if (!createdOrder) throw new ApiError(400, 'Failed to create order.');
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+  session.endSession();
+  return await getAnOrder(createdOrder._id!.toString());
 };
 
 const getAllOrders = async (
@@ -62,9 +73,8 @@ const getAnOrder = async (id: string | ObjectId): Promise<IOrder | null> => {
 const updateOrder = async (
   id: string,
   payload: Partial<IOrder>,
-  userId: ObjectId,
 ): Promise<IOrder | null> => {
-  return Order.findOneAndUpdate({ _id: id, user: userId }, payload, {
+  return Order.findOneAndUpdate({ _id: id }, payload, {
     new: true,
   });
 };

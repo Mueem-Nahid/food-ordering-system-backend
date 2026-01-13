@@ -30,7 +30,7 @@ router.get('/:id', auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN), OrderControl
 
 router.patch(
   '/:id',
-  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN),
   OrderController.updateOrder,
 );
 
