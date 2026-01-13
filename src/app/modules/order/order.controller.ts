@@ -98,10 +98,25 @@ const deleteOrder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getOrdersByUser = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    // @ts-ignore
+    const userId = req.user?._id;
+    const result: IOrder[] = await OrderService.getOrdersByUser(userId);
+    sendResponse<IOrder[]>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Orders for user retrieved successfully!',
+      data: result,
+    });
+  }
+);
+
 export const OrderController = {
   createOrder,
   getAllOrders,
   getAnOrder,
   updateOrder,
   deleteOrder,
+  getOrdersByUser,
 };

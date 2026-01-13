@@ -20,6 +20,12 @@ router.get(
   OrderController.getAllOrders,
 );
 
+router.get(
+  '/my-orders',
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  OrderController.getOrdersByUser,
+);
+
 router.get('/:id', auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN), OrderController.getAnOrder);
 
 router.patch(
