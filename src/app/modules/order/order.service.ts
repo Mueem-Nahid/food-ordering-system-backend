@@ -79,14 +79,14 @@ const updateOrder = async (
   });
 };
 
-const deleteOrder = async (id: string, userId: ObjectId): Promise<IOrder | null> => {
-  return Order.findOneAndDelete({ _id: id, user: userId });
+const deleteOrder = async (id: string): Promise<IOrder | null> => {
+  return Order.findOneAndDelete({ _id: id });
 };
 
 const getOrdersByUser = async (userId: string): Promise<IOrder[]> => {
   // Ensure userId is an ObjectId for the query
   const objectId = new Types.ObjectId(userId);
-  return Order.find({ user: objectId }).populate('user');
+  return Order.find({ user: objectId }).populate('user').sort({ createdAt: -1 });
 };
 
 export const OrderService = {

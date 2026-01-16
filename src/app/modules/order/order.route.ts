@@ -36,7 +36,7 @@ router.patch(
 
 router.delete(
   '/:id',
-  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN),
   OrderController.deleteOrder,
 );
 
