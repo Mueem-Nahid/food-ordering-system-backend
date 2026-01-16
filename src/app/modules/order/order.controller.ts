@@ -80,9 +80,7 @@ const updateOrder = catchAsync(async (req: Request, res: Response) => {
 
 const deleteOrder = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const userObj: JwtPayload | null = req.user;
-  const userId = userObj?._id;
-  const result = await OrderService.deleteOrder(id, userId);
+  const result = await OrderService.deleteOrder(id);
   if (!result)
     sendResponse<IOrder>(res, {
       statusCode: httpStatus.NOT_FOUND,

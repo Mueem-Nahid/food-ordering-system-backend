@@ -79,8 +79,8 @@ const updateOrder = async (
   });
 };
 
-const deleteOrder = async (id: string, userId: ObjectId): Promise<IOrder | null> => {
-  return Order.findOneAndDelete({ _id: id, user: userId });
+const deleteOrder = async (id: string): Promise<IOrder | null> => {
+  return Order.findOneAndDelete({ _id: id });
 };
 
 const getOrdersByUser = async (userId: string): Promise<IOrder[]> => {
