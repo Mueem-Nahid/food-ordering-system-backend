@@ -86,7 +86,7 @@ const deleteOrder = async (id: string): Promise<IOrder | null> => {
 const getOrdersByUser = async (userId: string): Promise<IOrder[]> => {
   // Ensure userId is an ObjectId for the query
   const objectId = new Types.ObjectId(userId);
-  return Order.find({ user: objectId }).populate('user');
+  return Order.find({ user: objectId }).populate('user').sort({ createdAt: -1 });
 };
 
 export const OrderService = {
