@@ -35,6 +35,7 @@ export const OrderSchema = new Schema<IOrder>(
     total_items: { type: Number, required: true },
     payment_method: { type: String, required: true },
     delivery_address: { type: String, required: true },
+    delivery_fee: { type: Number, required: true },
     phone_no: { type: String, required: true },
     order_status: {
       type: String,

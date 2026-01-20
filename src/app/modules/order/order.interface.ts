@@ -26,6 +26,7 @@ export type IOrder = {
   total_items: number;
   payment_method: string;
   delivery_address: string;
+  delivery_fee: number;
   phone_no: string;
   order_status: OrderStatus;
 };
