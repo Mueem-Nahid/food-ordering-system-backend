@@ -10,8 +10,8 @@ const createCouponZodSchema = z.object({
       message: "expiresAt must be a valid date string",
     }),
     usageLimit: z.number().int().positive().nullable().optional(),
-    usedCount: z.number().int().min(0).optional(),
-    minOrderValue: z.number().min(0).optional(),
+    usedCount: z.number().int().min(0).nullable().optional(),
+    minOrderValue: z.number().min(0).nullable().optional(),
   }),
 });
 
@@ -25,8 +25,8 @@ const updateCouponZodSchema = z.object({
       message: "expiresAt must be a valid date string",
     }).optional(),
     usageLimit: z.number().int().positive().nullable().optional(),
-    usedCount: z.number().int().min(0).optional(),
-    minOrderValue: z.number().min(0).optional(),
+    usedCount: z.number().int().min(0).nullable().optional(),
+    minOrderValue: z.number().min(0).nullable().optional(),
   }),
 });
 

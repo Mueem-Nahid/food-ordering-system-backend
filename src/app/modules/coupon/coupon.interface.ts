@@ -8,7 +8,7 @@ export type ICoupon = {
   expiresAt: Date;
   usageLimit?: number | null;
   usedCount?: number;
-  minOrderValue?: number;
+  minOrderValue?: number | null;
 };
 
 export type CouponModel = Model<ICoupon, Record<string, unknown>>;
