@@ -10,6 +10,14 @@ import { ObjectId, SortOrder } from "mongoose";
 import httpStatus from "http-status";
 
 const createCoupon = async (couponData: ICoupon): Promise<ICoupon> => {
+  // Check for existing active coupon with the same code
+  const existingActive = await Coupon.findOne({
+    code: couponData.code,
+    isActive: true,
+  });
+  if (existingActive) {
+    throw new ApiError(400, "An active coupon with this code already exists.");
+  }
   const createdCoupon = await Coupon.create(couponData);
   if (!createdCoupon) throw new ApiError(400, "Failed to create coupon.");
   return createdCoupon;
