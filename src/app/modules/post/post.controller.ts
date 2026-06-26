@@ -11,14 +11,17 @@ import {
   IPaginationOptions,
 } from '../../../interfaces/common';
 import { paginationFields } from '../../../constants/pagination';
-import { JwtPayload } from 'jsonwebtoken';
-import config from "../../../config";
+import ApiError from '../../../errors/ApiError';
 
 const createPost = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
     const postData = req.body;
-    const userObj: JwtPayload | null = req.user;
-    const userEmail = userObj?.email;
+    const userId = req.user?._id;
+    const userEmail = req.user?.email;
+    if (!userId || !userEmail) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated.');
+    }
+    postData.user = userId;
     const result: IPost | null = await PostService.createPost(
       postData,
       userEmail
@@ -40,9 +43,6 @@ const getAllPosts = catchAsync(
       req.query,
       paginationFields
     );
-
-    const userObj: JwtPayload | null = req.user;
-    const userId = userObj?._id;
 
     const result: IGenericResponsePagination<IPost[]> =
       await PostService.getAllPosts(filters, paginationOptions);
@@ -73,15 +73,18 @@ const getAPost = catchAsync(
 const updatePost = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const data = req.body;
-  const userObj: JwtPayload | null = req.user;
-  const userId = userObj?._id;
+  const userId = req.user?._id;
+  if (!userId) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated.');
+  }
   const result: IPost | null = await PostService.updatePost(id, data, userId);
-  if (!result)
-    sendResponse<IPost>(res, {
+  if (!result) {
+    return sendResponse<IPost>(res, {
       statusCode: httpStatus.NOT_FOUND,
       success: false,
       message: 'Post not updated. No post is available to update.',
     });
+  }
   sendResponse<IPost>(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -92,15 +95,18 @@ const updatePost = catchAsync(async (req: Request, res: Response) => {
 
 const deletePost = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const userObj: JwtPayload | null = req.user;
-  const userId = userObj?._id;
+  const userId = req.user?._id;
+  if (!userId) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated.');
+  }
   const result = await PostService.deletePost(id, userId);
-  if (!result)
-    sendResponse<IPost>(res, {
+  if (!result) {
+    return sendResponse<IPost>(res, {
       statusCode: httpStatus.NOT_FOUND,
       success: false,
       message: 'Post not deleted. No post is available to delete.',
     });
+  }
   sendResponse<IPost>(res, {
     statusCode: httpStatus.NO_CONTENT,
     success: true,
@@ -110,9 +116,12 @@ const deletePost = catchAsync(async (req: Request, res: Response) => {
 
 const reactToPost = catchAsync(async (req: Request, res: Response) => {
   const { postId } = req.params;
-  const user = req.user;
+  const userId = req.user?._id;
+  if (!userId) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated.');
+  }
   const { isLiked } = req.body;
-  const result = await PostService.reactToPost(postId, user?._id, isLiked);
+  const result = await PostService.reactToPost(postId, userId, isLiked);
   if (!result) {
     return sendResponse(res, {
       statusCode: httpStatus.BAD_REQUEST,

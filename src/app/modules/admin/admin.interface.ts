@@ -1,5 +1,4 @@
 import { Model } from 'mongoose';
-import { IUser } from '../user/user.interface';
 
 export type IRole = 'admin';
 
@@ -13,6 +12,7 @@ export type IAdmin = {
   email: string;
   password: string;
   name: string;
+  role: string;
 };
 
 // static methods
@@ -20,10 +20,10 @@ export type IAdmin = {
 export type IAdminMethods = {
   isExist(
     email: string
-  ): Promise<Pick<IAdmin, '_id' | 'email' | 'name'> | null>;
+  ): Promise<Pick<IAdmin, '_id' | 'email' | 'name' | 'password' | 'role'> | null>;
   isExistById(
     _id: string
-  ): Promise<Pick<IUser, '_id' | 'email' | 'name'> | null>;
+  ): Promise<Pick<IAdmin, '_id' | 'email' | 'name' | 'password' | 'role'> | null>;
   isPasswordMatched(
     enteredPassword: string,
     savedPassword: string

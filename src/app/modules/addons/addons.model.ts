@@ -6,6 +6,8 @@ export const addonsSchema = new Schema<IAddons>(
     name: {
       type: String,
       required: true,
+      unique: true,
+      trim: true,
     },
     price: {
       type: Number,

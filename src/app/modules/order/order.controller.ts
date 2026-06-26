@@ -10,11 +10,21 @@ import {
   IPaginationOptions,
 } from '../../../interfaces/common';
 import { paginationFields } from '../../../constants/pagination';
-import { JwtPayload } from 'jsonwebtoken';
+import ApiError from '../../../errors/ApiError';
 
 const createOrder = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
     const orderData = req.body;
+
+    // Force ownership from authenticated token
+    orderData.user = req.user?._id;
+    orderData.email = req.user?.email;
+
+    // Normalize payment_status to uppercase (Mongoose enum expects UPPERCASE)
+    if (orderData.payment_status) {
+      orderData.payment_status = orderData.payment_status.toUpperCase();
+    }
+
     const result: IOrder | null = await OrderService.createOrder(orderData);
 
     sendResponse(res, {
@@ -63,6 +73,11 @@ const getAnOrder = catchAsync(
 const updateOrder = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const data = req.body;
+
+  // Normalize enum fields to uppercase
+  if (data.payment_status) data.payment_status = data.payment_status.toUpperCase();
+  if (data.order_status) data.order_status = data.order_status.toUpperCase();
+
   const result: IOrder | null = await OrderService.updateOrder(id, data);
   if (!result)
     sendResponse<IOrder>(res, {
@@ -96,8 +111,10 @@ const deleteOrder = catchAsync(async (req: Request, res: Response) => {
 
 const getOrdersByUser = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
-    // @ts-ignore
     const userId = req.user?._id;
+    if (!userId) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated.');
+    }
     const result: IOrder[] = await OrderService.getOrdersByUser(userId);
     sendResponse<IOrder[]>(res, {
       statusCode: httpStatus.OK,

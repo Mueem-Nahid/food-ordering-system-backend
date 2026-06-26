@@ -1,8 +1,6 @@
-import { model, Schema, CallbackWithoutResult } from 'mongoose';
+import { model, Schema } from 'mongoose';
 import { AdminModel, IAdmin } from './admin.interface';
 import { hashPassword } from '../../../helpers/hashPassword';
-import { IUser } from '../user/user.interface';
-import { User } from '../user/user.model';
 
 const adminSchema = new Schema<IAdmin>(
   {
@@ -19,6 +17,11 @@ const adminSchema = new Schema<IAdmin>(
       required: true,
       select: 0,
     },
+    role: {
+      type: String,
+      default: 'admin',
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -30,20 +33,20 @@ const adminSchema = new Schema<IAdmin>(
 
 // instance method
 adminSchema.methods.isExist = async function (
-  phoneNumber: string
-): Promise<Pick<IAdmin, '_id' | 'password' | 'email' | 'name'> | null> {
+  email: string
+): Promise<Pick<IAdmin, '_id' | 'password' | 'email' | 'name' | 'role'> | null> {
   return Admin.findOne(
-    { phoneNumber },
-    { _id: 1, password: 1, email: 1, name: 1 }
+    { email },
+    { _id: 1, password: 1, email: 1, name: 1, role: 1 }
   ).lean();
 };
 
 adminSchema.methods.isExistById = async function (
   _id: string
-): Promise<Pick<IUser, '_id' | 'email' | 'name'> | null> {
-  return User.findOne(
+): Promise<Pick<IAdmin, '_id' | 'email' | 'name' | 'password' | 'role'> | null> {
+  return Admin.findOne(
     { _id },
-    { _id: 1, password: 1, email: 1, name: 1 }
+    { _id: 1, password: 1, email: 1, name: 1, role: 1 }
   ).lean();
 };
 
@@ -57,7 +60,9 @@ adminSchema.methods.isPasswordMatched = async function (
 // hash password using pre hook middleware (fat model thin controller)
 // User.create() / user.save()
 adminSchema.pre('save', async function () {
-  this.password = await hashPassword.encryptPassword(this.password);
+  if (this.isModified('password')) {
+    this.password = await hashPassword.encryptPassword(this.password);
+  }
 });
 
 export const Admin: AdminModel = model<IAdmin, AdminModel>(

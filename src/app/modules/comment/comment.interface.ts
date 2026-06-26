@@ -1,8 +1,8 @@
-import { Model, ObjectId } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export type IComment = {
-  _id: ObjectId;
-  commentedBy: ObjectId;
+  _id: Types.ObjectId;
+  commentedBy: Types.ObjectId;
   comment?: string;
   isLiked: boolean;
 };

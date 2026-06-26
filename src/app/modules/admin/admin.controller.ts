@@ -4,6 +4,7 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { IAdmin } from './admin.interface';
 import { AdminService } from './admin.service';
+import ApiError from '../../../errors/ApiError';
 
 const createAdmin: RequestHandler = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
@@ -23,15 +24,18 @@ const createAdmin: RequestHandler = catchAsync(
 
 const myProfile = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
-    const user = req.user;
-    const userId = user?._id;
+    const userId = req.user?._id;
+    if (!userId) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Admin not authenticated.');
+    }
     const result: IAdmin | null = await AdminService.getMyProfile(userId);
-    if (!result)
-      sendResponse(res, {
+    if (!result) {
+      return sendResponse(res, {
         statusCode: httpStatus.NOT_FOUND,
         success: false,
         message: 'Admin not found.',
       });
+    }
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -42,8 +46,10 @@ const myProfile = catchAsync(
 );
 
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
-  const userId = user?._id;
+  const userId = req.user?._id;
+  if (!userId) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Admin not authenticated.');
+  }
   const data = req.body;
   const result = await AdminService.updateMyProfile(userId, data);
   sendResponse<IAdmin>(res, {

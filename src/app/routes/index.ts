@@ -7,6 +7,7 @@ import { ProductRoutes } from '../modules/product/product.route';
 import { OrderRoutes } from '../modules/order/order.route';
 import { CategoryRoutes } from '../modules/category/category.route';
 import { AddonsRoutes } from '../modules/addons/addons.route';
+import { CouponRoutes } from '../modules/coupon/coupon.route';
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ const router = express.Router();
 const moduleRoutes: { path: string; route: Router }[] = [
   {
     path: '/auth',
-    route: UserRoutes,
+    route: AuthRoutes,
   },
   {
     path: '/users',
@@ -45,8 +46,8 @@ const moduleRoutes: { path: string; route: Router }[] = [
     route: AdminRoutes,
   },
   {
-    path: '/auth',
-    route: AuthRoutes,
+    path: '/coupons',
+    route: CouponRoutes,
   },
 ];
 

@@ -8,11 +8,15 @@ import handleZodError from '../../errors/handleZodError';
 import { IGenericErrorResponse } from '../../interfaces/common';
 import handleCastError from '../../errors/handleCastError';
 
-// eslint-disable-next-line no-unused-vars
-const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
-  if (config.env === 'development') {
-    console.log('*** globalErrorHandler *** ~ ', error);
-  } else {
+const isDev = config.env === 'development';
+
+const globalErrorHandler: ErrorRequestHandler = (
+  error,
+  _req,
+  res,
+  _next,
+) => {
+  if (isDev) {
     console.log('*** globalErrorHandler *** ~ ', error);
   }
 
@@ -57,13 +61,13 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
         ]
       : [];
   }
+
   res.status(statusCode).json({
     success: false,
     message,
     errorMessages,
-    stack: config.env !== 'production' ? error?.stack : undefined,
+    stack: isDev ? error?.stack : undefined,
   });
-  // next();
 };
 
 export default globalErrorHandler;

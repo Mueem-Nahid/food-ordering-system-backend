@@ -1,6 +1,19 @@
+/* eslint-disable no-unused-vars */
+export enum PaymentStatus {
+  UNPAID = 'UNPAID',
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
+}
+
 export enum OrderStatus {
   PENDING = 'PENDING',
   CONFIRMED = 'CONFIRMED',
   PREPARING = 'PREPARING',
   WAITING_FOR_DELIVERY = 'WAITING_FOR_DELIVERY',
+  OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
 }

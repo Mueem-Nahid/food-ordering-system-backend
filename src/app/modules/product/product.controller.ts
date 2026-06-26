@@ -11,8 +11,6 @@ import {
   IPaginationOptions,
 } from '../../../interfaces/common';
 import { paginationFields } from '../../../constants/pagination';
-import { JwtPayload } from 'jsonwebtoken';
-import config from '../../../config';
 
 const createProduct = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
@@ -67,15 +65,14 @@ const getAProduct = catchAsync(
 const updateProduct = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const data = req.body;
-  const userObj: JwtPayload | null = req.user;
-  const userId = userObj?._id;
   const result: IProduct | null = await ProductService.updateProduct(id, data);
-  if (!result)
-    sendResponse<IProduct>(res, {
+  if (!result) {
+    return sendResponse<IProduct>(res, {
       statusCode: httpStatus.NOT_FOUND,
       success: false,
       message: 'Product not updated. No product is available to update.',
     });
+  }
   sendResponse<IProduct>(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -87,12 +84,13 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
 const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const result = await ProductService.deleteProduct(id);
-  if (!result)
-    sendResponse<IProduct>(res, {
+  if (!result) {
+    return sendResponse<IProduct>(res, {
       statusCode: httpStatus.NOT_FOUND,
       success: false,
       message: 'Product not deleted. No product is available to delete.',
     });
+  }
   sendResponse<IProduct>(res, {
     statusCode: httpStatus.NO_CONTENT,
     success: true,
