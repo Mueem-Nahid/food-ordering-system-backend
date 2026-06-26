@@ -2,22 +2,14 @@ import { NextFunction, Request, Response } from 'express';
 import ApiError from '../../errors/ApiError';
 import httpStatus from 'http-status';
 import { jwtHelper } from '../../helpers/jwtHelper';
-import { Secret } from 'jsonwebtoken';
+import { JsonWebTokenError, Secret, TokenExpiredError } from 'jsonwebtoken';
 import config from '../../config';
+import { AuthenticatedUser } from '../../interfaces/auth';
 
 const auth =
   (...requiredRoles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const endpoint: string = req.baseUrl;
-      console.log(endpoint);
-      if (
-        endpoint === '/api/v1/products' &&
-        req.method === 'GET' &&
-        !req.headers.authorization
-      )
-        return next();
-
       // Expect "Bearer <token>"
       const authHeader: string | undefined = req.headers.authorization;
       if (!authHeader)
@@ -30,13 +22,12 @@ const auth =
         ? authHeader.split(' ')[1]
         : authHeader;
 
-      let verifiedUser = null;
-      verifiedUser = jwtHelper.verifyToken(
+      const verifiedUser = jwtHelper.verifyToken(
         token,
         config.jwt.jwt_secret as Secret
       );
 
-      req.user = verifiedUser;
+      req.user = verifiedUser as AuthenticatedUser;
 
       if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role))
         throw new ApiError(
@@ -46,6 +37,16 @@ const auth =
 
       next();
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        return next(
+          new ApiError(httpStatus.UNAUTHORIZED, 'Token has expired.')
+        );
+      }
+      if (error instanceof JsonWebTokenError) {
+        return next(
+          new ApiError(httpStatus.UNAUTHORIZED, 'Invalid access token.')
+        );
+      }
       next(error);
     }
   };

@@ -6,7 +6,7 @@ import {
   IPaginationOptions,
 } from '../../../interfaces/common';
 import { paginationHelper } from '../../../helpers/paginationHelper';
-import { ObjectId, SortOrder, Types } from 'mongoose';
+import { ObjectId, PipelineStage, SortOrder } from 'mongoose';
 import { productSearchableFields } from './product.constant';
 import config from '../../../config';
 
@@ -28,7 +28,7 @@ const getAllProducts = async (
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelper.calculatePagination(paginationOption);
   const { searchTerm, categoryName, ...otherFilters } = filters;
-  const andConditions: any[] = [];
+  const andConditions: Record<string, unknown>[] = [];
 
   // Search term filter
   if (searchTerm) {
@@ -54,7 +54,7 @@ const getAllProducts = async (
 
   // If filtering by category name, use aggregation
   if (categoryName) {
-    const aggregatePipeline: any[] = [
+    const aggregatePipeline: PipelineStage[] = [
       {
         $lookup: {
           from: 'categories',
@@ -95,7 +95,7 @@ const getAllProducts = async (
     const result = await Product.aggregate(aggregatePipeline);
 
     // For total count with category name filter
-    const countPipeline = [
+    const countPipeline: PipelineStage[] = [
       {
         $lookup: {
           from: 'categories',

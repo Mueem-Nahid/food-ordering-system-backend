@@ -16,6 +16,7 @@ router.post(
 // Google/NextAuth user upsert endpoint
 router.post(
   '/google-auth',
+  validateRequest(UserValidation.googleAuthZodSchema),
   UserController.upsertGoogleUser
 );
 
@@ -27,6 +28,7 @@ router.get(
 
 router.patch(
   '/:id',
+  validateRequest(UserValidation.updateUserZodSchema),
   auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
   UserController.updateUser,
 );

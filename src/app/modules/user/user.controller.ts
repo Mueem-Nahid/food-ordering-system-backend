@@ -4,6 +4,7 @@ import { UserService } from './user.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 
 const createUser = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
@@ -21,16 +22,8 @@ const createUser = catchAsync(
 // Upsert user from Google/NextAuth
 const upsertGoogleUser = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
-    const { email, name } = req.body;
-    if (!email || !name) {
-      sendResponse(res, {
-        statusCode: httpStatus.BAD_REQUEST,
-        success: false,
-        message: 'Email and name are required from Google profile.',
-      });
-      return;
-    }
-    const { user, accessToken } = await UserService.upsertGoogleUser({ email, name });
+    const { idToken } = req.body;
+    const { user, accessToken } = await UserService.upsertGoogleUser({ idToken });
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -69,7 +62,20 @@ const getUserById = catchAsync(
 
 const updateUser = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
-    const user = await UserService.updateUser(req.params.id, req.body);
+    const requester = req.user;
+    const targetId = req.params.id;
+
+    const isAdmin = requester?.role === 'admin';
+    const isSelf = requester?._id?.toString() === targetId;
+
+    if (!isAdmin && !isSelf) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        'You can only update your own profile.'
+      );
+    }
+
+    const user = await UserService.updateUser(targetId, req.body);
     sendResponse(res, {
       statusCode: user ? httpStatus.OK : httpStatus.NOT_FOUND,
       success: !!user,

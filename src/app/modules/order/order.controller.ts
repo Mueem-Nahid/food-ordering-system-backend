@@ -10,11 +10,16 @@ import {
   IPaginationOptions,
 } from '../../../interfaces/common';
 import { paginationFields } from '../../../constants/pagination';
-import { JwtPayload } from 'jsonwebtoken';
+import ApiError from '../../../errors/ApiError';
 
 const createOrder = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
     const orderData = req.body;
+
+    // Force ownership from authenticated token
+    orderData.user = req.user?._id;
+    orderData.email = req.user?.email;
+
     const result: IOrder | null = await OrderService.createOrder(orderData);
 
     sendResponse(res, {
@@ -96,8 +101,10 @@ const deleteOrder = catchAsync(async (req: Request, res: Response) => {
 
 const getOrdersByUser = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
-    // @ts-ignore
     const userId = req.user?._id;
+    if (!userId) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated.');
+    }
     const result: IOrder[] = await OrderService.getOrdersByUser(userId);
     sendResponse<IOrder[]>(res, {
       statusCode: httpStatus.OK,

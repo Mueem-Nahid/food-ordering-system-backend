@@ -6,6 +6,8 @@ export const categorySchema = new Schema<ICategory>(
     name: {
       type: String,
       required: true,
+      unique: true,
+      trim: true,
     },
     categoryImage: {
       type: String,

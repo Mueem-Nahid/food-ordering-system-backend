@@ -1,5 +1,5 @@
 import { Model, Types } from 'mongoose';
-import { OrderStatus } from '../../../enums/order';
+import { OrderStatus, PaymentStatus } from '../../../enums/order';
 
 export type IProductDetails = {
   price: number;
@@ -9,11 +9,18 @@ export type IProductDetails = {
   deliveryDay: string;
 };
 
+export type IOrderAddonItem = {
+  addon?: Types.ObjectId;
+  name: string;
+  price: number;
+  quantity: number;
+};
+
 export type IOrderProductItem = {
   product: IProductDetails;
   quantity: number;
-  addons: any[]; // Replace 'any' with a specific type if available
-  prod_id: string;
+  addons: IOrderAddonItem[];
+  prod_id: Types.ObjectId;
 };
 
 export type IOrder = {
@@ -21,12 +28,17 @@ export type IOrder = {
   product: IOrderProductItem[];
   user: Types.ObjectId;
   email: string;
-  payment_status: string;
+  payment_status: PaymentStatus;
   amount: number;
+  subtotal: number;
+  delivery_fee: number;
+  discount: number;
+  discountedAmount: number;
+  coupon?: Types.ObjectId | null;
+  couponCode?: string | null;
   total_items: number;
   payment_method: string;
   delivery_address: string;
-  delivery_fee: number;
   phone_no: string;
   order_status: OrderStatus;
 };

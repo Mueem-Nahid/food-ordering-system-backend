@@ -5,7 +5,7 @@ import { hashPassword } from '../../../helpers/hashPassword';
 const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true },
-    // password: { type: String, required: true, select: 0 },
+    password: { type: String, required: true, select: 0 },
     name: { type: String, required: true },
     address: { type: String },
     role: {
@@ -23,19 +23,19 @@ const userSchema = new Schema<IUser>(
 // instance method
 userSchema.methods.isExist = async function (
   email: string
-): Promise<Pick<IUser, '_id' | 'email' | 'name'> | null> {
+): Promise<Pick<IUser, '_id' | 'email' | 'name' | 'password' | 'role'> | null> {
   return User.findOne(
     { email },
-    { _id: 1, password: 1, email: 1, name: 1 }
+    { _id: 1, password: 1, email: 1, name: 1, role: 1 }
   ).lean();
 };
 
 userSchema.methods.isExistById = async function (
   _id: string
-): Promise<Pick<IUser, '_id' | 'email' | 'name'> | null> {
+): Promise<Pick<IUser, '_id' | 'email' | 'name' | 'password' | 'role'> | null> {
   return User.findOne(
     { _id },
-    { _id: 1, password: 1, email: 1, name: 1 }
+    { _id: 1, password: 1, email: 1, name: 1, role: 1 }
   ).lean();
 };
 
@@ -46,9 +46,10 @@ userSchema.methods.isPasswordMatched = async function (
   return hashPassword.decryptPassword(enteredPassword, savedPassword);
 };
 
-/*userSchema.pre('save', async function (next) {
-  this.password = await hashPassword.encryptPassword(this.password);
-  next();
-});*/
+userSchema.pre('save', async function () {
+  if (this.isModified('password')) {
+    this.password = await hashPassword.encryptPassword(this.password);
+  }
+});
 
 export const User = model<IUser, UserModel>('User', userSchema);

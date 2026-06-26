@@ -100,8 +100,11 @@ const deleteCoupon = catchAsync(async (req: Request, res: Response) => {
 
 // Apply coupon (validate and calculate discount)
 const applyCoupon = catchAsync(async (req: Request, res: Response) => {
-  const { code, orderAmount } = req.body;
-  const result = await CouponService.applyCoupon(code, orderAmount);
+  const { code, orderAmount, productIds, categoryIds } = req.body;
+  const result = await CouponService.applyCoupon(code, orderAmount, {
+    productIds,
+    categoryIds,
+  });
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

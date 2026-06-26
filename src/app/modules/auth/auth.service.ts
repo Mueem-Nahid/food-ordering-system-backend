@@ -27,24 +27,25 @@ const loginUser = async (
     modelInstance = new User();
   }
   const isPersonExist:
-    | Pick<IUser, 'email' | '_id' | 'name'>
-    | Pick<IAdmin, 'email' | '_id' | 'name'>
+    | Pick<IUser, 'email' | '_id' | 'name' | 'password' | 'role'>
+    | Pick<IAdmin, 'email' | '_id' | 'name' | 'password' | 'role'>
     | null = await modelInstance.isExist(email);
   if (!isPersonExist)
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found !');
 
   // match password
- /* if (
+  if (
     isPersonExist.password &&
     !(await modelInstance.isPasswordMatched(password, isPersonExist.password))
   )
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'ID or password is incorrect.');*/
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'ID or password is incorrect.');
 
   // create access and refresh token
   const accessToken: string = jwtHelper.createToken(
     {
       _id: isPersonExist?._id,
       email: isPersonExist?.email,
+      role: isPersonExist?.role,
     },
     config.jwt.jwt_secret as Secret,
     { expiresIn: config.jwt.jwt_expired_time }
@@ -54,6 +55,7 @@ const loginUser = async (
     {
       _id: isPersonExist?._id,
       email: isPersonExist?.email,
+      role: isPersonExist?.role,
     },
     config.jwt.jwt_refresh_secret as Secret,
     { expiresIn: config.jwt.jwt_refresh_token_expired_time }
@@ -81,20 +83,21 @@ const createRefreshToken = async (
       token,
       config.jwt.jwt_refresh_secret as Secret
     );
-  } catch (e) {
+  } catch {
     throw new ApiError(httpStatus.FORBIDDEN, 'Invalid refresh token.');
   }
-  const { _id } = verifiedToken;
+  const { _id, role } = verifiedToken;
 
-  const user = new User();
-  const isUserExist = await user.isExistById(_id);
-  if (!isUserExist)
+  const modelInstance = role === 'admin' ? new Admin() : new User();
+  const isPersonExist = await modelInstance.isExistById(_id);
+  if (!isPersonExist)
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist.');
 
   const newAccessToken: string = jwtHelper.createToken(
     {
-      _id: isUserExist?._id,
-      email: isUserExist?.email,
+      _id: isPersonExist?._id,
+      email: isPersonExist?.email,
+      role: isPersonExist?.role,
     },
     config.jwt.jwt_secret as Secret,
     { expiresIn: config.jwt.jwt_expired_time }

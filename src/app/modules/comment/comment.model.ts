@@ -1,5 +1,5 @@
-import { model, Schema } from 'mongoose';
-import { IComment, CommentModel } from './comment.interface';
+import { Schema } from 'mongoose';
+import { IComment } from './comment.interface';
 
 export const commentSchema = new Schema<IComment>(
   {
@@ -10,11 +10,10 @@ export const commentSchema = new Schema<IComment>(
     comment: {
       type: String,
     },
+    isLiked: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true }
-);
-
-export const Comment: CommentModel = model<IComment, CommentModel>(
-  'Comment',
-  commentSchema
+  { timestamps: true },
 );

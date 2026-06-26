@@ -17,7 +17,7 @@ router.post(
 router.get('/', auth(ENUM_USER_ROLE.ADMIN),
   CouponController.getAllCoupons);
 
-router.get("/:id", CouponController.getCouponById);
+router.get("/:id", auth(ENUM_USER_ROLE.ADMIN), CouponController.getCouponById);
 
 router.patch(
   "/:id",
@@ -32,7 +32,12 @@ router.delete(
   CouponController.deleteCoupon
 );
 
-// Apply coupon (public, no auth)
-router.post("/apply", CouponController.applyCoupon);
+// Apply coupon (authenticated users only)
+router.post(
+  "/apply",
+  validateRequest(CouponValidation.applyCouponZodSchema),
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  CouponController.applyCoupon
+);
 
 export const CouponRoutes = router;

@@ -1,16 +1,18 @@
-import mongoose, { Model, ObjectId } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { IComment } from '../comment/comment.interface';
 
+export type IPostReaction = {
+  user: Types.ObjectId;
+};
+
 export type IPost = {
-  // _id?: ObjectId;
   post: string;
-  likes: ObjectId[];
-  dislikes: ObjectId[];
+  likes: IPostReaction[];
+  dislikes: IPostReaction[];
   totalLikes: number;
   totalDislikes: number;
   comments: IComment[];
   user: mongoose.Types.ObjectId;
-  toObject(): any;
 };
 
 export type IPostFilter = {

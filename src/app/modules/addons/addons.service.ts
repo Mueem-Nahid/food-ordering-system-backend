@@ -7,7 +7,6 @@ import {
 } from '../../../interfaces/common';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import { ObjectId, SortOrder } from 'mongoose';
-import httpStatus from 'http-status';
 
 const createAddons = async (addonsData: IAddons): Promise<IAddons | null> => {
   const createdAddons = await Addons.create(addonsData);

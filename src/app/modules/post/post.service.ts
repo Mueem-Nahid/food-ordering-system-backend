@@ -6,7 +6,7 @@ import {
   IPaginationOptions,
 } from '../../../interfaces/common';
 import { paginationHelper } from '../../../helpers/paginationHelper';
-import { ObjectId, SortOrder } from 'mongoose';
+import { ObjectId, SortOrder, Types } from 'mongoose';
 import { User } from '../user/user.model';
 import httpStatus from 'http-status';
 import { postSearchableFields } from './post.constant';
@@ -109,53 +109,29 @@ const deletePost = async (id: string, user: string): Promise<IPost | null> => {
 };
 
 const reactToPost = async (id: string, userId: string, isLiked: boolean) => {
+  const userObjectId = new Types.ObjectId(userId);
+
+  if (isLiked) {
+    await Post.findByIdAndUpdate(id, {
+      $addToSet: { likes: { user: userObjectId } },
+      $pull: { dislikes: { user: userObjectId } },
+    });
+  } else {
+    await Post.findByIdAndUpdate(id, {
+      $addToSet: { dislikes: { user: userObjectId } },
+      $pull: { likes: { user: userObjectId } },
+    });
+  }
+
   const post = await Post.findById(id);
   if (!post) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Post not found.');
   }
 
-  // Find the user's index in the likes and dislikes arrays
-  const userLikeIndex = post.likes.findIndex(
-    // @ts-ignore
-    like => like.user.toString() === userId
-  );
-
-  const userDislikeIndex = post.dislikes.findIndex(
-    // @ts-ignore
-    dislike => dislike.user.toString() === userId
-  );
-
-  if (isLiked) {
-    if (userLikeIndex !== -1) {
-      // User has already liked, remove the like
-      post.likes.splice(userLikeIndex, 1);
-    } else {
-      // User has not liked, add a like and remove a dislike if present
-      // @ts-ignore
-      post.likes.push({ user: userId });
-      if (userDislikeIndex !== -1) {
-        post.dislikes.splice(userDislikeIndex, 1);
-      }
-    }
-  } else {
-    if (userDislikeIndex !== -1) {
-      // User has already disliked, remove the dislike
-      post.dislikes.splice(userDislikeIndex, 1);
-    } else {
-      // User has not disliked, add a dislike and remove a like if present
-      // @ts-ignore
-      post.dislikes.push({ user: userId });
-      if (userLikeIndex !== -1) {
-        post.likes.splice(userLikeIndex, 1);
-      }
-    }
-  }
-
-  // Recalculate the totalLikes and totalDislikes based on the arrays
+  // Recalculate totals from array lengths (safer than relying on $inc)
   post.totalLikes = post.likes.length;
   post.totalDislikes = post.dislikes.length;
 
-  // Save the updated post
   return await post.save();
 };
 
