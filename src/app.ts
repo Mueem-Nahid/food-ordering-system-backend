@@ -1,7 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import mongoSanitize from 'express-mongo-sanitize';
+import mongoSanitize from './app/middlewares/mongoSanitize';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
